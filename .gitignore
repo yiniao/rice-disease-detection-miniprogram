@@ -1,0 +1,57 @@
+# ===== 环境变量与凭据 =====
+# 只提交 .env.example;真实值放本机 .env 或云托管环境变量
+.env
+.env.*
+!.env.example
+
+# 小程序 / 前端的私有部署配置(云托管域名、云开发环境 ID、服务名)
+miniapp/utils/config.local.js
+
+# 微信开发者工具的私有配置(每位开发者本机不同,且可能带 appid)
+project.private.config.json
+
+# ===== 数据库与运行时产物 =====
+db.sqlite3
+*.sqlite3
+media/
+test_media/
+staticfiles/
+
+# ===== 日志与调试产物 =====
+*.log
+logs/
+.dbg/
+.hermes/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Python =====
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+
+# ===== 编辑器与系统 =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== 模型权重 =====
+# best.onnx 会被 Dockerfile 打包进镜像,需要提交(其元数据只有 Ultralytics 官方信息,无个人内容)。
+# best.pt 不提交,两个原因:
+#   1) 它是 PyTorch 训练产物,YOLO 会把训练时的本机绝对路径 pickle 进文件
+#      —— 实测该文件内嵌了本机训练目录,会泄露用户名与目录结构;
+#   2) 部署与推理都优先使用 best.onnx,settings.py 里 best.pt 只是兜底,onnx 已覆盖。
+0712_null/weights/best.pt

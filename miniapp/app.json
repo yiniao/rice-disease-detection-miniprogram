@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/result/result",
+    "pages/history/history",
+    "pages/dataset/dataset",
+    "pages/statistics/statistics",
+    "pages/profile/profile"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#6b7280",
+    "selectedColor": "#2e7d32",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "检测",
+        "iconPath": "images/tabbar/tab-detect.png",
+        "selectedIconPath": "images/tabbar/tab-detect-active.png"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "text": "历史",
+        "iconPath": "images/tabbar/tab-history.png",
+        "selectedIconPath": "images/tabbar/tab-history-active.png"
+      },
+      {
+        "pagePath": "pages/dataset/dataset",
+        "text": "采集",
+        "iconPath": "images/tabbar/tab-dataset.png",
+        "selectedIconPath": "images/tabbar/tab-dataset-active.png"
+      },
+      {
+        "pagePath": "pages/statistics/statistics",
+        "text": "统计",
+        "iconPath": "images/tabbar/tab-stats.png",
+        "selectedIconPath": "images/tabbar/tab-stats-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tabbar/tab-profile.png",
+        "selectedIconPath": "images/tabbar/tab-profile-active.png"
+      }
+    ]
+  },
+  "window": {
+    "navigationBarTitleText": "水稻病虫害检测",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7faf5"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

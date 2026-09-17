@@ -1,0 +1,267 @@
+.index-page {
+  display: grid;
+  gap: 20rpx;
+}
+
+/* 品牌 hero */
+.brand-hero {
+  padding: 32rpx;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%);
+  border: 1rpx solid #dcedc8;
+}
+
+.brand-hero__icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+  font-size: 64rpx;
+  line-height: 120rpx;
+  text-align: center;
+  box-shadow: 0 12rpx 28rpx rgba(46, 125, 50, 0.12);
+}
+
+.brand-hero__title {
+  margin-top: 20rpx;
+  font-size: 42rpx;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.brand-hero__sub {
+  margin-top: 10rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 1.7;
+}
+
+.brand-hero__tags {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.brand-hero__tag {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+/* 上传面板 */
+.panel {
+  display: grid;
+  gap: 16rpx;
+}
+
+.panel--empty .empty-state {
+  padding: 48rpx 0;
+}
+
+.upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 56rpx 32rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #c8e6c9;
+  background: #f7faf5;
+}
+
+.upload-trigger__icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 48rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-weight: 300;
+}
+
+.upload-trigger__text {
+  color: #2e7d32;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.upload-trigger__tip {
+  color: #9ca3af;
+  font-size: 24rpx;
+}
+
+.preview-box {
+  display: grid;
+  gap: 10rpx;
+  padding: 16rpx;
+  border-radius: 16rpx;
+  background: #f6f9f4;
+  border: 1rpx solid #e3ebdf;
+}
+
+.preview-image {
+  width: 100%;
+  border-radius: 12rpx;
+}
+
+.info-list {
+  display: grid;
+  gap: 10rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #eef2f7;
+}
+
+.info-row:last-child {
+  border-bottom: 0;
+}
+
+.info-label {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.info-value {
+  color: #1f2937;
+  font-size: 24rpx;
+  word-break: break-all;
+  text-align: right;
+}
+
+/* 结果摘要 */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.summary-card {
+  padding: 16rpx;
+  background: #f6f9f4;
+  border: 1rpx solid #e3ebdf;
+  border-radius: 14rpx;
+}
+
+.summary-label {
+  color: #6b7280;
+  font-size: 20rpx;
+}
+
+.summary-value {
+  margin-top: 6rpx;
+  color: #1f2937;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+/* 结果图片 */
+.result-image-wrap {
+  display: grid;
+  gap: 10rpx;
+}
+
+.result-image {
+  width: 100%;
+  border-radius: 16rpx;
+}
+
+/* 结果列表 */
+.result-list {
+  display: grid;
+  gap: 12rpx;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16rpx;
+  padding: 18rpx;
+  background: #f6f9f4;
+  border: 1rpx solid #e3ebdf;
+  border-radius: 14rpx;
+}
+
+.result-item__main {
+  min-width: 0;
+}
+
+.result-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.result-meta {
+  margin-top: 6rpx;
+  color: #6b7280;
+  font-size: 22rpx;
+}
+
+.result-confidence {
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+/* 建议卡片 */
+.advice-card {
+  padding: 20rpx;
+  background: #fff8e1;
+  border: 1rpx solid #ffecb3;
+  border-radius: 16rpx;
+}
+
+.advice-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 12rpx;
+}
+
+.advice-card__icon {
+  font-size: 30rpx;
+}
+
+.advice-card__title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.advice-card__body {
+  color: #4b5563;
+  font-size: 26rpx;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.warn-text {
+  margin-top: 12rpx;
+  color: #b45309;
+  font-size: 24rpx;
+}
+
+@media screen and (max-width: 750rpx) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

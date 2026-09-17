@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水稻病虫害检测系统</title>
+    <style>
+        :root { --bg1: #eef8e2; --bg2: #f9fcf4; --ink: #193024; --green: #2d6a3d; --line: #d9e7d1; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft YaHei", sans-serif; color: var(--ink); background: radial-gradient(circle at top left, var(--bg1), var(--bg2) 60%); }
+        .wrap { max-width: 1040px; margin: 0 auto; padding: 48px 24px 64px; }
+        .hero { background: rgba(255,255,255,0.94); border: 1px solid var(--line); border-radius: 28px; padding: 36px; box-shadow: 0 20px 48px rgba(52, 97, 54, 0.08); }
+        h1 { margin: 0; font-size: 42px; line-height: 1.2; }
+        p { color: #516756; line-height: 1.8; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+        .btn { display: inline-block; text-decoration: none; border-radius: 999px; padding: 12px 18px; }
+        .btn-primary { background: var(--green); color: #fff; }
+        .btn-secondary { background: #edf5e8; color: var(--ink); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px; }
+        .card { background: rgba(255,255,255,0.92); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
+        .card h2 { margin: 0 0 10px; font-size: 22px; }
+        code { background: #f1f7ee; padding: 2px 6px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <section class="hero">
+            <h1>水稻病虫害检测系统</h1>
+            <p>当前服务已启动。你可以从这里进入管理后台，或直接调用检测、采集、登录 API。微信小程序前端位于同仓库的 <code>miniapp/</code> 目录。</p>
+            <div class="actions">
+                <a class="btn btn-primary" href="/dashboard/login/">进入管理后台</a>
+                <a class="btn btn-secondary" href="/dashboard/statistics/">数据统计页</a>
+                <a class="btn btn-secondary" href="/django-admin/">Django Admin</a>
+            </div>
+        </section>
+
+        <section class="grid">
+            <div class="card">
+                <h2>检测接口</h2>
+                <p><code>POST /api/detections/</code><br><code>GET /api/detections/</code></p>
+            </div>
+            <div class="card">
+                <h2>数据采集</h2>
+                <p><code>POST /api/dataset-images/</code><br><code>GET /api/dataset-images/</code></p>
+            </div>
+            <div class="card">
+                <h2>微信登录</h2>
+                <p><code>POST /api/auth/login/</code></p>
+            </div>
+            <div class="card">
+                <h2>管理接口</h2>
+                <p><code>/api/admin/...</code><br><code>/dashboard/...</code></p>
+            </div>
+            <div class="card">
+                <h2>统计分析</h2>
+                <p><code>/dashboard/statistics/</code><br><code>/api/admin/statistics/</code></p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

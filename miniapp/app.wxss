@@ -1,0 +1,188 @@
+/* 水稻病虫害检测 - 视觉主题变量 */
+page {
+  --rice-primary: #2e7d32;
+  --rice-primary-light: #e8f5e9;
+  --rice-primary-soft: #c8e6c9;
+  --rice-accent: #f9a825;
+  --rice-accent-light: #fff8e1;
+  --rice-bg: #f7faf5;
+  --rice-card: #ffffff;
+  --rice-border: #e3ebdf;
+  --rice-text: #1f2937;
+  --rice-text-secondary: #6b7280;
+  --rice-text-tertiary: #9ca3af;
+  --rice-success: #2e7d32;
+  --rice-warning: #f59e0b;
+  --rice-danger: #ef4444;
+  --rice-shadow: rgba(31, 41, 55, 0.06);
+
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background: var(--rice-bg);
+  color: var(--rice-text);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+view,
+text,
+button,
+image {
+  box-sizing: border-box;
+}
+
+image {
+  display: block;
+  max-width: 100%;
+}
+
+button::after {
+  border: 0;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.page-shell {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  padding: 24rpx 24rpx 190rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  min-width: 0;
+  max-width: 100%;
+  background: var(--rice-card);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  border: 1rpx solid var(--rice-border);
+  box-shadow: 0 8rpx 24rpx var(--rice-shadow);
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--rice-text);
+}
+
+.section-subtitle {
+  margin-top: 10rpx;
+  color: var(--rice-text-secondary);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.button-primary,
+.button-secondary,
+.button-ghost {
+  min-height: 72rpx;
+  padding: 0 30rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  line-height: 72rpx;
+}
+
+.button-primary {
+  background: var(--rice-primary);
+  color: #fff;
+}
+
+.button-primary.button-hover {
+  background: #1b5e20;
+}
+
+.button-secondary {
+  background: var(--rice-primary-light);
+  color: var(--rice-primary);
+}
+
+.button-secondary.button-hover {
+  background: var(--rice-primary-soft);
+}
+
+.button-ghost {
+  background: transparent;
+  color: var(--rice-primary);
+  border: 1rpx solid var(--rice-primary-soft);
+}
+
+.button-ghost.button-hover {
+  background: var(--rice-primary-light);
+}
+
+.form-input {
+  margin-top: 18rpx;
+  background: #f8fafc;
+  padding: 22rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--rice-border);
+}
+
+.action-row {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-top: 18rpx;
+}
+
+/* 通用状态标签 */
+.badge {
+  display: inline-flex;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: var(--rice-primary-light);
+  color: var(--rice-primary);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.badge--accent {
+  background: var(--rice-accent-light);
+  color: #f57f17;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx 32rpx;
+  text-align: center;
+  color: var(--rice-text-secondary);
+  font-size: 26rpx;
+  line-height: 1.8;
+}
+
+.empty-state__icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+  border-radius: 50%;
+  background: var(--rice-primary-light);
+  color: var(--rice-primary);
+  font-size: 60rpx;
+  line-height: 120rpx;
+  text-align: center;
+}
+
+.empty-state__tip {
+  margin-top: 8rpx;
+  color: var(--rice-text-tertiary);
+  font-size: 24rpx;
+}
+
+/* 轻提示 */
+.warn-text {
+  color: #b45309;
+  font-size: 24rpx;
+}

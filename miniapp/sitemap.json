@@ -1,0 +1,9 @@
+{
+  "desc": "rice-detect sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

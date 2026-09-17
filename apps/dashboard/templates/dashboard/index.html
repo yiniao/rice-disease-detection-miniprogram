@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>水稻病虫害管理后台</title>
+    <style>
+        :root { --ink: #183124; --green: #2d6a3d; --green-soft: #dcebd7; --paper: #f8fbf4; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft YaHei", sans-serif; color: var(--ink); background: radial-gradient(circle at top left, #edf7dd, #f7fbf5 55%); }
+        header { padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d9e6d4; }
+        h1 { margin: 0; font-size: 28px; }
+        main { padding: 24px 32px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        .panel { background: rgba(255,255,255,0.92); border-radius: 18px; padding: 20px; box-shadow: 0 18px 40px rgba(59, 98, 58, 0.08); }
+        .panel h2 { margin-top: 0; font-size: 20px; }
+        pre { white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow: auto; background: var(--paper); padding: 12px; border-radius: 12px; }
+        a, button { color: white; background: var(--green); border: 0; border-radius: 10px; padding: 10px 14px; text-decoration: none; cursor: pointer; }
+        .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .metric { font-size: 34px; font-weight: 700; margin: 8px 0; }
+        .subtle { color: #5e7462; font-size: 14px; }
+        .item { border: 1px solid #e0ead9; border-radius: 14px; padding: 14px; margin-bottom: 12px; background: #fbfdf8; }
+        .item strong { display: block; margin-bottom: 8px; }
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .ghost { background: #eef6ea; color: #21482b; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>水稻病虫害检测后台</h1>
+            <div class="subtle">管理员：{{ request.user.username }}</div>
+        </div>
+        <div class="toolbar">
+            <a class="ghost" href="{% url 'dashboard-statistics' %}">数据统计页</a>
+            <a href="{% url 'dashboard-logout' %}">退出</a>
+        </div>
+    </header>
+    <main>
+        <section class="panel">
+            <h2>统计概览</h2>
+            <div class="metric" id="detection-count">-</div>
+            <div class="subtle">检测记录数</div>
+            <div class="metric" id="dataset-count">-</div>
+            <div class="subtle">采集图片数</div>
+        </section>
+        <section class="panel">
+            <h2>最新检测记录</h2>
+            <div class="toolbar"><button data-load="detections">刷新</button></div>
+            <div id="detections-box">加载中...</div>
+        </section>
+        <section class="panel">
+            <h2>数据集采集记录</h2>
+            <div class="toolbar"><button data-load="dataset">刷新</button></div>
+            <div id="dataset-box">加载中...</div>
+        </section>
+        <section class="panel">
+            <h2>模型配置</h2>
+            <div class="toolbar"><button data-load="models">刷新</button></div>
+            <div id="models-box">加载中...</div>
+        </section>
+    </main>
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return '';
+        }
+
+        async function loadJson(url) {
+            const response = await fetch(url, { credentials: 'same-origin' });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        }
+
+        async function patchJson(url, body) {
+            const response = await fetch(url, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        }
+
+        function renderDetections(items) {
+            const box = document.getElementById('detections-box');
+            if (!items.length) {
+                box.innerHTML = '<div class="subtle">暂无检测记录</div>';
+                return;
+            }
+            box.innerHTML = items.slice(0, 5).map((item) => `
+                <div class="item">
+                    <strong>#${item.id} · ${item.status}</strong>
+                    <div>模型：${item.model_name || '-'} / ${item.model_version || '-'}</div>
+                    <div>结果数：${item.results.length}</div>
+                    <div>建议来源：${item.advice ? item.advice.source_display : '-'}</div>
+                    <div>时间：${item.created_at}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderDataset(items) {
+            const box = document.getElementById('dataset-box');
+            if (!items.length) {
+                box.innerHTML = '<div class="subtle">暂无采集记录</div>';
+                return;
+            }
+            box.innerHTML = items.slice(0, 5).map((item) => `
+                <div class="item">
+                    <strong>#${item.id} · ${item.status}</strong>
+                    <div>地点：${item.location_text || '-'}</div>
+                    <div>生育期：${item.growth_stage || '-'}</div>
+                    <div>训练集：${item.is_in_training_set ? '是' : '否'}</div>
+                    <div class="actions">
+                        <button class="ghost" onclick="updateDataset(${item.id}, 'selected', true)">标记入训练集</button>
+                        <button class="ghost" onclick="updateDataset(${item.id}, 'rejected', false)">剔除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderModels(items) {
+            const box = document.getElementById('models-box');
+            if (!items.length) {
+                box.innerHTML = '<div class="subtle">暂无模型配置，可先在 Django 原生后台创建。</div>';
+                return;
+            }
+            box.innerHTML = items.map((item) => `
+                <div class="item">
+                    <strong>${item.name} ${item.version}</strong>
+                    <div>后端：${item.backend}</div>
+                    <div>权重：${item.weights_path || '-'}</div>
+                    <div>状态：${item.is_active ? '当前启用' : '未启用'}</div>
+                    <div class="actions">
+                        <button onclick="activateModel(${item.id})">${item.is_active ? '已启用' : '启用该模型'}</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateDataset(id, status, isInTrainingSet) {
+            try {
+                await patchJson(`/api/admin/dataset-images/${id}/`, {
+                    status,
+                    is_in_training_set: isInTrainingSet
+                });
+                await refreshAll();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function activateModel(id) {
+            try {
+                await patchJson(`/api/admin/model-configs/${id}/activate/`, {});
+                await refreshAll();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function refreshAll() {
+            const [detections, dataset, models] = await Promise.all([
+                loadJson('/api/admin/detections/'),
+                loadJson('/api/admin/dataset-images/'),
+                loadJson('/api/admin/model-configs/')
+            ]);
+            document.getElementById('detection-count').textContent = detections.length;
+            document.getElementById('dataset-count').textContent = dataset.length;
+            renderDetections(detections);
+            renderDataset(dataset);
+            renderModels(models);
+        }
+
+        document.querySelectorAll('[data-load]').forEach((button) => {
+            button.addEventListener('click', refreshAll);
+        });
+
+        refreshAll().catch((error) => {
+            document.getElementById('detections-box').textContent = error.message;
+            document.getElementById('dataset-box').textContent = error.message;
+            document.getElementById('models-box').textContent = error.message;
+        });
+    </script>
+</body>
+</html>

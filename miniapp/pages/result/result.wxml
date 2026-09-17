@@ -1,0 +1,77 @@
+<view class="result-page page-shell" wx:if="{{detail}}">
+  <view class="card result-hero">
+    <view class="hero-badge">检测详情</view>
+    <view class="hero-title">{{detail.record_code}}</view>
+    <view class="hero-copy">集中查看原图、可视化标注、识别结果和病虫害建议，适合历史记录回溯和结果复核。</view>
+
+    <view class="summary-grid">
+      <view class="summary-card">
+        <view class="summary-label">状态</view>
+        <view class="summary-value">{{detail.status_display}}</view>
+      </view>
+      <view class="summary-card">
+        <view class="summary-label">模型</view>
+        <view class="summary-value">{{detail.model_name}} / {{detail.model_version}}</view>
+      </view>
+      <view class="summary-card">
+        <view class="summary-label">分辨率</view>
+        <view class="summary-value">{{detail.image_width}} × {{detail.image_height}}</view>
+      </view>
+      <view class="summary-card" wx:if="{{detail.advice}}">
+        <view class="summary-label">建议来源</view>
+        <view class="summary-value">{{detail.advice.source_display}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card visual-card">
+    <view class="section-title">可视化预览</view>
+    <view class="section-subtitle">标注了识别框的检测结果图片。</view>
+    <view wx:if="{{detail.visualized_image_local_path || detail.visualized_image_url || detail.preview_image_local_path || detail.preview_image_url || detail.original_image_local_path || detail.original_image_url}}" class="visual-image-wrap">
+      <image src="{{detail.visualized_image_local_path || detail.visualized_image_url || detail.preview_image_local_path || detail.preview_image_url || detail.original_image_local_path || detail.original_image_url}}" mode="widthFix" class="visual-image"></image>
+    </view>
+    <view class="action-row">
+      <button class="button-secondary" bindtap="saveImage" data-url="{{detail.original_image_local_path || detail.original_image_url}}" data-filename="{{detail.original_image_name}}">保存原图</button>
+      <button class="button-primary" bindtap="saveImage" data-url="{{detail.visualized_image_url || detail.visualized_image_local_path}}" data-filename="{{detail.visualized_image_name || detail.preview_image_name}}">保存可视化</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">识别结果</view>
+    <view class="section-subtitle">每个识别目标以单独结果卡展示，方便快速浏览病害信息。</view>
+    <view class="result-list">
+      <view wx:for="{{detail.results}}" wx:key="id" class="result-item">
+        <view class="result-item__main">
+          <view class="result-title">{{item.label_display}}</view>
+          <view class="result-meta">检测到 1 个目标区域</view>
+        </view>
+        <view class="result-confidence">{{item.confidenceText}}</view>
+      </view>
+      <view wx:if="{{!detail.results.length}}" class="empty-box">未检测到目标。</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{detail.advice}}">
+    <view class="section-title">病虫害建议</view>
+    <view class="section-subtitle">建议内容会明确区分真实 DeepSeek 回答和本地兜底文案。</view>
+    <view class="advice-card">
+      <view class="advice-card__head">
+        <text class="advice-card__icon">💡</text>
+        <text class="advice-card__title">防治建议</text>
+      </view>
+      <view class="advice-card__body">{{detail.advice.response_text}}</view>
+      <view wx:if="{{detail.advice.source === 'local-fallback'}}" class="warn-text">
+        当前建议为本地兜底文案，不是 DeepSeek 实时回答。
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="result-page page-shell" wx:else>
+  <view class="card empty-detail">
+    <view class="empty-state">
+      <view class="empty-state__icon">📋</view>
+      <view>暂无结果，请先从首页完成一次检测。</view>
+    </view>
+  </view>
+</view>

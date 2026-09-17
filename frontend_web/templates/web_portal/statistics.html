@@ -1,0 +1,747 @@
+{% extends "web_portal/base.html" %}
+
+{% block title %}数据统计{% endblock %}
+
+{% block content %}
+<style>
+    .stats-shell {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .stats-hero {
+        padding: 28px;
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(231,243,222,0.96));
+        border: 1px solid #d5e4d0;
+        box-shadow: 0 18px 44px rgba(61, 104, 60, 0.08);
+    }
+    .stats-hero p {
+        margin: 8px 0 0;
+        color: #5a705f;
+        line-height: 1.7;
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+    }
+    .quick-range {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 14px;
+    }
+    .metric-card {
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(241,248,236,0.95));
+        border: 1px solid #d5e4d0;
+    }
+    .metric-label {
+        color: #5a705f;
+        font-size: 13px;
+    }
+    .metric-value {
+        margin-top: 10px;
+        font-size: 32px;
+        font-weight: 700;
+    }
+    .stats-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+        gap: 18px;
+        align-items: start;
+    }
+    .stats-main,
+    .stats-side {
+        display: grid;
+        gap: 18px;
+    }
+    .chart-card h2 {
+        margin: 0;
+    }
+    .chart-subtitle {
+        margin: 8px 0 0;
+        color: #5a705f;
+        line-height: 1.6;
+    }
+    .chart-shell {
+        position: relative;
+        height: 320px;
+        margin-top: 16px;
+    }
+    .chart-shell.compact {
+        height: 280px;
+    }
+    .chart-shell.tall {
+        height: 360px;
+    }
+    .split-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+    .recent-list {
+        display: grid;
+        gap: 12px;
+        max-height: 380px;
+        overflow-y: auto;
+        margin-top: 16px;
+        padding-right: 4px;
+    }
+    .recent-item {
+        border: 1px solid #d5e4d0;
+        border-radius: 18px;
+        background: #fbfdf8;
+        padding: 14px;
+    }
+    .recent-item strong {
+        display: block;
+        margin-bottom: 8px;
+    }
+    .recent-meta {
+        display: grid;
+        gap: 6px;
+        color: #5a705f;
+        line-height: 1.55;
+        font-size: 13px;
+    }
+    .empty-chart {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        margin-top: 16px;
+        border: 1px dashed #d5e4d0;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(243,249,238,0.86), rgba(255,255,255,0.94));
+        color: #68806c;
+    }
+    .error-box {
+        display: none;
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: #fdeceb;
+        color: #8d3127;
+    }
+    .loading-state {
+        opacity: 0.62;
+        pointer-events: none;
+    }
+    @media (max-width: 1200px) {
+        .stats-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 820px) {
+        .split-grid {
+            grid-template-columns: 1fr;
+        }
+        .chart-shell,
+        .chart-shell.compact,
+        .chart-shell.tall {
+            height: 290px;
+        }
+    }
+</style>
+
+<section class="stats-shell" id="stats-shell">
+    <div class="stats-hero">
+        <h1 style="margin:0;">检测记录数据统计</h1>
+        <p>普通用户默认查看自己账号下的统计结果；管理员可查看全部数据，并按指定用户账号进行筛选查询。</p>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:flex-start;">
+            <div>
+                <h2 style="margin:0;">筛选条件</h2>
+                <div class="chart-subtitle">导出 Excel 报表会严格跟随当前筛选条件。</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" type="button" id="export-report">导出 Excel 报表</button>
+                <button class="btn btn-secondary" type="button" id="reset-filters">重置</button>
+                <button class="btn" type="button" id="apply-filters">应用筛选</button>
+            </div>
+        </div>
+        <div class="quick-range">
+            <button class="btn btn-secondary" type="button" data-range="7">近 7 天</button>
+            <button class="btn btn-secondary" type="button" data-range="30">近 30 天</button>
+            <button class="btn btn-secondary" type="button" data-range="90">近 90 天</button>
+            <button class="btn btn-secondary" type="button" data-range="365">近 1 年</button>
+        </div>
+        <div class="filter-grid">
+            <div class="field">
+                <label for="start-date">开始日期</label>
+                <input id="start-date" type="date">
+            </div>
+            <div class="field">
+                <label for="end-date">结束日期</label>
+                <input id="end-date" type="date">
+            </div>
+            <div class="field">
+                <label for="category">病虫害类别</label>
+                <select id="category"><option value="">全部类别</option></select>
+            </div>
+            <div class="field">
+                <label for="status">检测状态</label>
+                <select id="status"><option value="">全部状态</option></select>
+            </div>
+            <div class="field">
+                <label for="model">模型版本</label>
+                <select id="model"><option value="">全部模型</option></select>
+            </div>
+            <div class="field" id="user-filter-field" {% if not can_select_user %}style="display:none;"{% endif %}>
+                <label for="user">用户账号</label>
+                <select id="user"><option value="">全部用户</option></select>
+            </div>
+            <div class="field">
+                <label for="granularity">时间粒度</label>
+                <select id="granularity"><option value="auto">自动</option></select>
+            </div>
+        </div>
+        <div class="error-box" id="error-box"></div>
+    </div>
+
+    <div class="summary-grid" id="summary-grid"></div>
+
+    <div class="stats-layout">
+        <div class="stats-main">
+            <div class="card chart-card">
+                <h2>检测趋势折线图</h2>
+                <div class="chart-subtitle">查看总记录数、成功数和失败数在时间轴上的变化趋势。</div>
+                <div class="chart-shell tall">
+                    <canvas id="timeline-chart"></canvas>
+                </div>
+                <div class="empty-chart" id="timeline-empty">当前筛选条件下没有趋势数据</div>
+            </div>
+
+            <div class="split-grid">
+                <div class="card chart-card">
+                    <h2>类别分布条形图</h2>
+                    <div class="chart-subtitle">展示各病虫害类别的检测次数和平均置信度。</div>
+                    <div class="chart-shell compact">
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                    <div class="empty-chart" id="category-empty">暂无类别统计数据</div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>检测状态饼图</h2>
+                    <div class="chart-subtitle">展示成功、失败、处理中记录的比例结构。</div>
+                    <div class="chart-shell compact">
+                        <canvas id="status-chart"></canvas>
+                    </div>
+                    <div class="empty-chart" id="status-empty">暂无状态统计数据</div>
+                </div>
+            </div>
+
+            <div class="split-grid">
+                <div class="card chart-card">
+                    <h2>模型使用柱状图</h2>
+                    <div class="chart-subtitle">对比不同模型版本处理记录数量的差异。</div>
+                    <div class="chart-shell compact">
+                        <canvas id="model-chart"></canvas>
+                    </div>
+                    <div class="empty-chart" id="model-empty">暂无模型分布数据</div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>用户检测排行条形图</h2>
+                    <div class="chart-subtitle">管理员可查看所有用户排行，普通用户只看到自己的统计。</div>
+                    <div class="chart-shell compact">
+                        <canvas id="user-chart"></canvas>
+                    </div>
+                    <div class="empty-chart" id="user-empty">暂无用户统计数据</div>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h2>置信度区间分布柱状图</h2>
+                <div class="chart-subtitle">查看检测框落在不同置信度区间的分布情况。</div>
+                <div class="chart-shell">
+                    <canvas id="confidence-chart"></canvas>
+                </div>
+                <div class="empty-chart" id="confidence-empty">暂无置信度数据</div>
+            </div>
+        </div>
+
+        <div class="stats-side">
+            <div class="card">
+                <h2 style="margin:0;">最近检测记录</h2>
+                <div class="chart-subtitle">固定高度滚动显示，避免记录过多把页面整体撑长。</div>
+                <div class="recent-list" id="recent-box"></div>
+                <div class="empty-chart" id="recent-empty">当前筛选条件下没有最近记录</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const statisticsApiUrl = '{{ statistics_api_url }}';
+        const statisticsExportUrl = '{{ statistics_export_url }}';
+        const canSelectUser = {{ can_select_user|yesno:"true,false" }};
+        const elements = {
+            shell: document.getElementById('stats-shell'),
+            summaryGrid: document.getElementById('summary-grid'),
+            errorBox: document.getElementById('error-box'),
+            recentBox: document.getElementById('recent-box'),
+            recentEmpty: document.getElementById('recent-empty'),
+            startDate: document.getElementById('start-date'),
+            endDate: document.getElementById('end-date'),
+            category: document.getElementById('category'),
+            status: document.getElementById('status'),
+            model: document.getElementById('model'),
+            user: document.getElementById('user'),
+            granularity: document.getElementById('granularity'),
+            timelineEmpty: document.getElementById('timeline-empty'),
+            categoryEmpty: document.getElementById('category-empty'),
+            statusEmpty: document.getElementById('status-empty'),
+            modelEmpty: document.getElementById('model-empty'),
+            userEmpty: document.getElementById('user-empty'),
+            confidenceEmpty: document.getElementById('confidence-empty'),
+            userFilterField: document.getElementById('user-filter-field'),
+        };
+
+        const chartRefs = {};
+        const summaryMeta = [
+            ['total_records', '检测记录总数'],
+            ['success_rate', '成功率', '%'],
+            ['total_results', '检测框总数'],
+            ['avg_results_per_image', '单图平均检测框'],
+            ['avg_duration_ms', '平均耗时', ' ms'],
+            ['avg_confidence', '平均置信度', '%'],
+            ['unique_users', '涉及用户数'],
+            ['unique_categories', '涉及类别数']
+        ];
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        function setSelectOptions(select, options, selectedValue, valueKey = 'value', labelKey = 'label') {
+            const current = selectedValue || '';
+            const firstLabel = select.options[0] ? select.options[0].text : '全部';
+            const rest = options.map((item) => {
+                const value = typeof item === 'string' ? item : item[valueKey];
+                const label = typeof item === 'string' ? item : item[labelKey];
+                const selected = String(value) === String(current) ? ' selected' : '';
+                return `<option value="${escapeHtml(value)}"${selected}>${escapeHtml(label)}</option>`;
+            }).join('');
+            select.innerHTML = `<option value="">${firstLabel}</option>${rest}`;
+            select.value = current;
+        }
+
+        function getFilters() {
+            return {
+                start_date: elements.startDate.value,
+                end_date: elements.endDate.value,
+                category: elements.category.value,
+                status: elements.status.value,
+                model: elements.model.value,
+                user_id: canSelectUser && elements.user ? elements.user.value : '',
+                granularity: elements.granularity.value
+            };
+        }
+
+        function setFilters(selected) {
+            elements.startDate.value = selected.start_date || '';
+            elements.endDate.value = selected.end_date || '';
+            elements.category.value = selected.category || '';
+            elements.status.value = selected.status || '';
+            elements.model.value = selected.model || '';
+            if (elements.user) {
+                elements.user.value = selected.user_id || '';
+            }
+            elements.granularity.value = selected.granularity || 'auto';
+        }
+
+        function buildQuery(filters) {
+            const params = new URLSearchParams();
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== '' && value !== null && value !== undefined) {
+                    params.set(key, value);
+                }
+            });
+            return params.toString();
+        }
+
+        function syncUrl(filters) {
+            const query = buildQuery(filters);
+            const url = `${window.location.pathname}${query ? `?${query}` : ''}`;
+            window.history.replaceState({}, '', url);
+        }
+
+        function loadFiltersFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                start_date: params.get('start_date') || '',
+                end_date: params.get('end_date') || '',
+                category: params.get('category') || '',
+                status: params.get('status') || '',
+                model: params.get('model') || '',
+                user_id: params.get('user_id') || '',
+                granularity: params.get('granularity') || 'auto'
+            };
+        }
+
+        function setLoadingState(isLoading) {
+            elements.shell.classList.toggle('loading-state', isLoading);
+        }
+
+        function toggleEmpty(canvasId, emptyEl, hasData) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            canvas.parentElement.style.display = hasData ? 'block' : 'none';
+            emptyEl.style.display = hasData ? 'none' : 'flex';
+        }
+
+        function destroyChart(name) {
+            if (chartRefs[name]) {
+                chartRefs[name].destroy();
+                chartRefs[name] = null;
+            }
+        }
+
+        function baseChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#355343',
+                            boxWidth: 14,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 16
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(22, 49, 38, 0.92)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#eef6ee',
+                        padding: 12,
+                        cornerRadius: 10,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(215, 228, 212, 0.56)' },
+                        ticks: { color: '#617666' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(215, 228, 212, 0.56)' },
+                        ticks: { color: '#617666' },
+                        beginAtZero: true
+                    }
+                }
+            };
+        }
+
+        function renderTimelineChart(items) {
+            destroyChart('timeline');
+            toggleEmpty('timeline-chart', elements.timelineEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.timeline = new Chart(document.getElementById('timeline-chart'), {
+                type: 'line',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [
+                        {
+                            label: '总记录数',
+                            data: items.map((item) => item.total),
+                            borderColor: '#2f6c45',
+                            backgroundColor: 'rgba(47, 108, 69, 0.14)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                        },
+                        {
+                            label: '成功记录数',
+                            data: items.map((item) => item.success),
+                            borderColor: '#4d87d8',
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                        },
+                        {
+                            label: '失败记录数',
+                            data: items.map((item) => item.failed),
+                            borderColor: '#c35540',
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                        }
+                    ]
+                },
+                options: baseChartOptions()
+            });
+        }
+
+        function renderCategoryChart(items) {
+            destroyChart('category');
+            toggleEmpty('category-chart', elements.categoryEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.category = new Chart(document.getElementById('category-chart'), {
+                type: 'bar',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [{
+                        label: '检测次数',
+                        data: items.map((item) => item.total),
+                        backgroundColor: items.map((_, index) => index % 2 === 0 ? '#2f6c45' : '#7ca66d'),
+                        borderRadius: 8,
+                        maxBarThickness: 42,
+                    }]
+                },
+                options: {
+                    ...baseChartOptions(),
+                    plugins: {
+                        ...baseChartOptions().plugins,
+                        tooltip: {
+                            ...baseChartOptions().plugins.tooltip,
+                            callbacks: {
+                                afterBody(context) {
+                                    const index = context[0].dataIndex;
+                                    return `平均置信度：${items[index].avg_confidence}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderStatusChart(items) {
+            destroyChart('status');
+            toggleEmpty('status-chart', elements.statusEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.status = new Chart(document.getElementById('status-chart'), {
+                type: 'pie',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [{
+                        data: items.map((item) => item.total),
+                        backgroundColor: items.map((item) => item.color),
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#355343', boxWidth: 14, padding: 18 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(22, 49, 38, 0.92)',
+                            callbacks: {
+                                label(context) {
+                                    const item = items[context.dataIndex];
+                                    return `${item.label}: ${item.total} (${item.percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderModelChart(items) {
+            destroyChart('model');
+            toggleEmpty('model-chart', elements.modelEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.model = new Chart(document.getElementById('model-chart'), {
+                type: 'bar',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [{
+                        label: '记录数',
+                        data: items.map((item) => item.total),
+                        backgroundColor: '#87ad7a',
+                        borderRadius: 8,
+                        maxBarThickness: 46,
+                    }]
+                },
+                options: baseChartOptions()
+            });
+        }
+
+        function renderUserChart(items) {
+            destroyChart('user');
+            toggleEmpty('user-chart', elements.userEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.user = new Chart(document.getElementById('user-chart'), {
+                type: 'bar',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [
+                        {
+                            label: '检测记录数',
+                            data: items.map((item) => item.total),
+                            backgroundColor: '#2f6c45',
+                            borderRadius: 8,
+                            maxBarThickness: 30,
+                        },
+                        {
+                            label: '成功数',
+                            data: items.map((item) => item.success),
+                            backgroundColor: '#b8ce92',
+                            borderRadius: 8,
+                            maxBarThickness: 30,
+                        }
+                    ]
+                },
+                options: baseChartOptions()
+            });
+        }
+
+        function renderConfidenceChart(items) {
+            destroyChart('confidence');
+            toggleEmpty('confidence-chart', elements.confidenceEmpty, items.length > 0);
+            if (!items.length) return;
+            chartRefs.confidence = new Chart(document.getElementById('confidence-chart'), {
+                type: 'bar',
+                data: {
+                    labels: items.map((item) => item.label),
+                    datasets: [{
+                        label: '检测框数量',
+                        data: items.map((item) => item.total),
+                        backgroundColor: ['#d9b15f', '#caa04a', '#a8bb76', '#6a9b63'],
+                        borderRadius: 10,
+                        maxBarThickness: 54,
+                    }]
+                },
+                options: baseChartOptions()
+            });
+        }
+
+        function renderRecent(records) {
+            elements.recentBox.innerHTML = '';
+            elements.recentEmpty.style.display = records.length ? 'none' : 'flex';
+            elements.recentBox.style.display = records.length ? 'grid' : 'none';
+            if (!records.length) return;
+            elements.recentBox.innerHTML = records.map((item) => `
+                <article class="recent-item">
+                    <strong>#${item.id} · ${escapeHtml(item.status)}</strong>
+                    <div class="recent-meta">
+                        <span>用户：${escapeHtml(item.user)}</span>
+                        <span>模型：${escapeHtml(item.model)}</span>
+                        <span>时间：${escapeHtml(item.created_at)}</span>
+                        <span>耗时：${item.duration_ms} ms</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderStatistics(payload) {
+            const { summary, charts, recent_records, filters } = payload;
+            setSelectOptions(elements.category, filters.options.categories, filters.selected.category);
+            setSelectOptions(elements.status, filters.options.statuses, filters.selected.status);
+            setSelectOptions(elements.model, filters.options.models, filters.selected.model, 'value', 'label');
+            if (elements.user) {
+                setSelectOptions(elements.user, filters.options.users, filters.selected.user_id, 'id', 'username');
+            }
+            setSelectOptions(elements.granularity, filters.options.granularities, filters.selected.granularity);
+            if (elements.userFilterField) {
+                elements.userFilterField.style.display = filters.options.can_select_user ? '' : 'none';
+            }
+            setFilters(filters.selected);
+
+            elements.summaryGrid.innerHTML = summaryMeta.map(([key, label, suffix = '']) => `
+                <div class="card metric-card">
+                    <div class="metric-label">${label}</div>
+                    <div class="metric-value">${summary[key]}${suffix}</div>
+                </div>
+            `).join('');
+
+            renderTimelineChart(charts.timeline);
+            renderCategoryChart(charts.categories);
+            renderStatusChart(charts.status_distribution);
+            renderModelChart(charts.model_distribution);
+            renderUserChart(charts.user_distribution);
+            renderConfidenceChart(charts.confidence_distribution);
+            renderRecent(recent_records);
+        }
+
+        async function loadStatistics(overrideFilters = null) {
+            const filters = overrideFilters || getFilters();
+            syncUrl(filters);
+            setLoadingState(true);
+            elements.errorBox.style.display = 'none';
+            try {
+                const response = await fetch(`${statisticsApiUrl}?${buildQuery(filters)}`, {
+                    credentials: 'same-origin'
+                });
+                const payload = await response.json();
+                if (!response.ok) {
+                    throw new Error(payload.detail || `HTTP ${response.status}`);
+                }
+                renderStatistics(payload);
+            } catch (error) {
+                elements.errorBox.textContent = error.message;
+                elements.errorBox.style.display = 'block';
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function resetFilters() {
+            elements.startDate.value = '';
+            elements.endDate.value = '';
+            elements.category.value = '';
+            elements.status.value = '';
+            elements.model.value = '';
+            if (elements.user) elements.user.value = '';
+            elements.granularity.value = 'auto';
+            loadStatistics();
+        }
+
+        function exportReport() {
+            const query = buildQuery(getFilters());
+            window.location.href = `${statisticsExportUrl}${query ? `?${query}` : ''}`;
+        }
+
+        function setQuickRange(days) {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - Number(days) + 1);
+            elements.startDate.value = start.toISOString().slice(0, 10);
+            elements.endDate.value = end.toISOString().slice(0, 10);
+            loadStatistics();
+        }
+
+        document.getElementById('apply-filters').addEventListener('click', loadStatistics);
+        document.getElementById('reset-filters').addEventListener('click', resetFilters);
+        document.getElementById('export-report').addEventListener('click', exportReport);
+        document.querySelectorAll('[data-range]').forEach((button) => {
+            button.addEventListener('click', () => setQuickRange(button.dataset.range));
+        });
+
+        const initialFilters = loadFiltersFromUrl();
+        elements.startDate.value = initialFilters.start_date;
+        elements.endDate.value = initialFilters.end_date;
+        loadStatistics(initialFilters);
+    })();
+</script>
+{% endblock %}

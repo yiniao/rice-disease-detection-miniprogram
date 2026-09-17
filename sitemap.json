@@ -1,0 +1,9 @@
+{
+  "desc": "django-rice project-root sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

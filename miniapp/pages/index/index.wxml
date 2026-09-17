@@ -1,0 +1,112 @@
+<view class="page-shell index-page">
+  <view class="card brand-hero">
+    <view class="brand-hero__icon">🌾</view>
+    <view class="brand-hero__title">稻田病虫害检测</view>
+    <view class="brand-hero__sub">上传水稻叶片照片，AI 快速识别病害并给出防治建议。</view>
+    <view class="brand-hero__tags">
+      <view class="brand-hero__tag">智能识别</view>
+      <view class="brand-hero__tag">可视化标注</view>
+      <view class="brand-hero__tag">防治建议</view>
+    </view>
+  </view>
+
+  <view class="card panel">
+    <view class="section-title">上传图片</view>
+    <view class="section-subtitle">建议使用清晰近景图，让叶片主体占画面较大比例。</view>
+
+    <view wx:if="{{!imagePath}}" class="upload-trigger" bindtap="chooseImage">
+      <view class="upload-trigger__icon">＋</view>
+      <view class="upload-trigger__text">点击选择图片</view>
+      <view class="upload-trigger__tip">支持相册或拍照</view>
+    </view>
+
+    <view wx:if="{{imagePath}}" class="preview-box">
+      <image src="{{imagePath}}" mode="widthFix" class="preview-image"></image>
+    </view>
+
+    <view wx:if="{{imageInfo}}" class="info-list">
+      <view class="info-row">
+        <text class="info-label">文件类型</text>
+        <text class="info-value">{{imageInfo.fileType}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">分辨率</text>
+        <text class="info-value">{{imageInfo.width}} × {{imageInfo.height}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">大小</text>
+        <text class="info-value">{{imageInfo.sizeKb}} KB</text>
+      </view>
+    </view>
+
+    <view class="action-row" wx:if="{{imagePath}}">
+      <button class="button-secondary" bindtap="chooseImage">重新选择</button>
+      <button class="button-primary" bindtap="submitDetection" loading="{{loading}}">开始检测</button>
+    </view>
+  </view>
+
+  <view class="card panel" wx:if="{{result}}">
+    <view class="section-title">检测结果</view>
+    <view class="section-subtitle">模型识别结果、可视化图片与防治建议。</view>
+
+    <view class="result-stack">
+      <view class="summary-grid">
+        <view class="summary-card">
+          <view class="summary-label">状态</view>
+          <view class="summary-value">{{result.status_display}}</view>
+        </view>
+        <view class="summary-card">
+          <view class="summary-label">模型</view>
+          <view class="summary-value">{{result.model_name}}</view>
+        </view>
+        <view class="summary-card">
+          <view class="summary-label">耗时</view>
+          <view class="summary-value">{{result.duration_ms}} ms</view>
+        </view>
+        <view class="summary-card">
+          <view class="summary-label">目标数</view>
+          <view class="summary-value">{{result.results.length}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{result.visualized_image_local_path}}" class="result-image-wrap">
+        <image src="{{result.visualized_image_local_path}}" mode="widthFix" class="result-image"></image>
+      </view>
+
+    <view class="action-row" wx:if="{{result.original_image_local_path || result.original_image_url || result.visualized_image_local_path || result.visualized_image_url}}">
+        <button class="button-secondary" bindtap="saveImage" data-kind="original">保存原图</button>
+        <button class="button-primary" bindtap="saveImage" data-kind="visualized">保存结果图</button>
+      </view>
+
+      <view class="result-list" wx:if="{{result.results.length}}">
+        <view wx:for="{{result.results}}" wx:key="id" class="result-item">
+          <view class="result-item__main">
+            <view class="result-title">{{item.label_display}}</view>
+            <view class="result-meta">检测到 1 个目标区域</view>
+          </view>
+          <view class="result-confidence">{{item.confidenceText}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{result.advice}}" class="advice-card">
+        <view class="advice-card__head">
+          <text class="advice-card__icon">💡</text>
+          <text class="advice-card__title">病虫害防治建议</text>
+        </view>
+        <view class="advice-card__body">{{result.advice.response_text}}</view>
+        <view wx:if="{{result.advice.source === 'local-fallback'}}" class="warn-text">
+          当前建议为本地兜底文案，不是 DeepSeek 实时回答。
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!result}}" class="card panel panel--empty">
+    <view class="section-title">检测结果</view>
+    <view class="empty-state">
+      <view class="empty-state__icon">🔍</view>
+      <view>上传图片后，这里会显示检测结果。</view>
+    </view>
+  </view>
+
+</view>

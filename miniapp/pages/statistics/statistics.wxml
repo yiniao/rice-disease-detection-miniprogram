@@ -1,0 +1,180 @@
+<view class="stats-page page-shell">
+  <view class="hero card glass">
+    <view class="hero-badge">数据洞察</view>
+    <view class="hero-title">检测记录数据统计</view>
+    <view class="hero-copy">普通用户只看自己的数据，管理员可切换用户查询。导出报表会跟随当前筛选条件。</view>
+
+    <view class="summary-grid">
+      <view wx:for="{{summaryCards}}" wx:key="label" class="summary-card">
+        <view class="summary-value">{{item.value}}</view>
+        <view class="summary-label">{{item.label}}</view>
+        <view class="summary-note">{{item.note}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card panel">
+    <view class="panel-head">
+      <view>
+        <view class="section-title">筛选条件</view>
+        <view class="section-subtitle">支持时间、类别、状态、模型和用户维度筛选。</view>
+      </view>
+      <view class="action-row">
+        <button class="ghost-btn" bindtap="resetFilters">重置</button>
+        <button class="ghost-btn" bindtap="exportReport">导出报表</button>
+        <button class="primary-btn" bindtap="applyFilters">查询</button>
+      </view>
+    </view>
+
+    <view class="quick-row">
+      <button class="quick-btn" data-days="7" bindtap="setQuickRange">近 7 天</button>
+      <button class="quick-btn" data-days="30" bindtap="setQuickRange">近 30 天</button>
+      <button class="quick-btn" data-days="90" bindtap="setQuickRange">近 90 天</button>
+      <button class="quick-btn" data-days="365" bindtap="setQuickRange">近 1 年</button>
+    </view>
+
+    <view class="filter-grid">
+      <picker mode="date" value="{{start_date}}" bindchange="onStartDateChange">
+        <view class="filter-item">
+          <text class="filter-label">开始日期</text>
+          <text class="filter-value">{{start_date || '全部'}}</text>
+        </view>
+      </picker>
+      <picker mode="date" value="{{end_date}}" bindchange="onEndDateChange">
+        <view class="filter-item">
+          <text class="filter-label">结束日期</text>
+          <text class="filter-value">{{end_date || '全部'}}</text>
+        </view>
+      </picker>
+      <picker range="{{categoryOptions}}" range-key="label" value="{{selectedCategoryIndex}}" bindchange="onCategoryChange">
+        <view class="filter-item">
+          <text class="filter-label">病虫害类别</text>
+          <text class="filter-value">{{selectedCategoryLabel}}</text>
+        </view>
+      </picker>
+      <picker range="{{statusOptions}}" range-key="label" value="{{selectedStatusIndex}}" bindchange="onStatusChange">
+        <view class="filter-item">
+          <text class="filter-label">检测状态</text>
+          <text class="filter-value">{{selectedStatusLabel}}</text>
+        </view>
+      </picker>
+      <picker range="{{modelOptions}}" range-key="label" value="{{selectedModelIndex}}" bindchange="onModelChange">
+        <view class="filter-item">
+          <text class="filter-label">模型版本</text>
+          <text class="filter-value">{{selectedModelLabel}}</text>
+        </view>
+      </picker>
+      <picker wx:if="{{hasUserFilter}}" range="{{userOptions}}" range-key="label" value="{{selectedUserIndex}}" bindchange="onUserChange">
+        <view class="filter-item">
+          <text class="filter-label">用户账号</text>
+          <text class="filter-value">{{selectedUserLabel}}</text>
+        </view>
+      </picker>
+      <picker range="{{granularityOptions}}" range-key="label" value="{{selectedGranularityIndex}}" bindchange="onGranularityChange">
+        <view class="filter-item">
+          <text class="filter-label">时间粒度</text>
+          <text class="filter-value">{{selectedGranularityLabel}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view wx:if="{{error}}" class="error-box">{{error}}</view>
+  </view>
+
+  <view class="card chart-card">
+    <view class="section-title">检测趋势</view>
+    <view class="section-subtitle">按时间粒度展示总记录、成功和失败变化。</view>
+    <view wx:if="{{timelineRows.length}}" class="timeline-grid">
+      <view wx:for="{{timelineRows}}" wx:key="label" class="timeline-item">
+        <view class="timeline-bar-wrap">
+          <view class="timeline-bar" style="height: {{item.barHeight}}rpx;"></view>
+        </view>
+        <text class="timeline-total">{{item.total}}</text>
+        <text class="timeline-label">{{item.label}}</text>
+        <text class="timeline-meta">成 {{item.success}} / 败 {{item.failed}}</text>
+      </view>
+    </view>
+    <view wx:else class="empty-state">暂无趋势数据</view>
+  </view>
+
+  <view class="stack-list">
+    <view class="card chart-card">
+      <view class="section-title">类别分布</view>
+      <view class="section-subtitle">展示各病虫害类别的检测次数与平均置信度。</view>
+      <view wx:if="{{categoryRows.length}}" class="bar-list">
+        <view wx:for="{{categoryRows}}" wx:key="label" class="bar-item">
+          <view class="bar-head">
+            <text class="bar-label">{{item.label}}</text>
+            <text class="bar-value">{{item.total}} 次 · {{item.avg_confidence}}%</text>
+          </view>
+          <view class="bar-track"><view class="bar-fill" style="width: {{item.barWidth}};"></view></view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">暂无类别数据</view>
+    </view>
+
+    <view class="card chart-card">
+      <view class="section-title">状态分布</view>
+      <view class="section-subtitle">成功、失败、处理中记录的结构占比。</view>
+      <view wx:if="{{statusRows.length}}" class="bar-list">
+        <view wx:for="{{statusRows}}" wx:key="label" class="bar-item">
+          <view class="bar-head">
+            <text class="bar-label">{{item.label}}</text>
+            <text class="bar-value">{{item.total}} · {{item.percent}}%</text>
+          </view>
+          <view class="bar-track"><view class="bar-fill status-fill" style="width: {{item.barWidth}};"></view></view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">暂无状态数据</view>
+    </view>
+  </view>
+
+  <view class="stack-list">
+    <view class="card chart-card">
+      <view class="section-title">模型使用</view>
+      <view class="section-subtitle">对比不同模型版本的记录数量。</view>
+      <view wx:if="{{modelRows.length}}" class="bar-list">
+        <view wx:for="{{modelRows}}" wx:key="label" class="bar-item">
+          <view class="bar-head">
+            <text class="bar-label">{{item.label}}</text>
+            <text class="bar-value">{{item.total}} 次</text>
+          </view>
+          <view class="bar-track"><view class="bar-fill model-fill" style="width: {{item.barWidth}};"></view></view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">暂无模型数据</view>
+    </view>
+
+    <view class="card chart-card">
+      <view class="section-title">用户排行</view>
+      <view class="section-subtitle">管理员可看全部用户，普通用户只看自己。</view>
+      <view wx:if="{{userRows.length}}" class="bar-list">
+        <view wx:for="{{userRows}}" wx:key="label" class="bar-item">
+          <view class="bar-head">
+            <text class="bar-label">{{item.label}}</text>
+            <text class="bar-value">{{item.total}} 次</text>
+          </view>
+          <view class="bar-track"><view class="bar-fill user-fill" style="width: {{item.barWidth}};"></view></view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">暂无用户数据</view>
+    </view>
+  </view>
+
+  <view class="stack-list">
+    <view class="card chart-card">
+      <view class="section-title">置信度分布</view>
+      <view class="section-subtitle">查看不同置信度区间里的检测框数量。</view>
+      <view wx:if="{{confidenceRows.length}}" class="bar-list">
+        <view wx:for="{{confidenceRows}}" wx:key="label" class="bar-item">
+          <view class="bar-head">
+            <text class="bar-label">{{item.label}}</text>
+            <text class="bar-value">{{item.total}} 个</text>
+          </view>
+          <view class="bar-track"><view class="bar-fill confidence-fill" style="width: {{item.barWidth}};"></view></view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">暂无置信度数据</view>
+    </view>
+  </view>
+</view>

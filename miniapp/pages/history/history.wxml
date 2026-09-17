@@ -1,0 +1,46 @@
+<view class="history-page page-shell">
+  <view class="card hero-card">
+    <view class="hero-badge">历史归档</view>
+    <view class="hero-title">检测历史总览</view>
+    <view class="hero-copy">集中回看你在田间上传过的所有检测图片，快速进入详情页继续查看可视化结果、检测框和病虫害建议。</view>
+  </view>
+
+  <view class="history-list" wx:if="{{records.length}}">
+    <view wx:for="{{records}}" wx:key="id" class="card history-card">
+      <view class="history-thumb-wrap">
+        <image wx:if="{{item.preview_image_local_path || item.preview_image_url || item.original_image_local_path || item.original_image_url}}" src="{{item.preview_image_local_path || item.preview_image_url || item.original_image_local_path || item.original_image_url}}" mode="aspectFill" class="history-thumb"></image>
+        <view wx:else class="history-thumb history-thumb--placeholder">🌾</view>
+      </view>
+      <view class="history-content">
+        <view class="history-title">{{item.record_title}}</view>
+        <view class="history-chip-row">
+          <view class="category-chip">{{item.primary_category_label}}</view>
+          <view class="status-chip">{{item.status_display}}</view>
+        </view>
+        <view class="history-meta">分辨率：{{item.image_width}} × {{item.image_height}}</view>
+        <view class="history-meta">时间：{{item.display_created_at}}</view>
+        <view class="history-meta">结果数：{{item.results_count}}</view>
+        <view wx:if="{{item.advice_source_display}}" class="history-meta">建议来源：{{item.advice_source_display}}</view>
+        <view class="history-action-grid">
+          <button class="history-action-btn history-action-btn--secondary" bindtap="openDetail" data-id="{{item.id}}">查看详情</button>
+          <button class="history-action-btn history-action-btn--primary" bindtap="saveImage" data-url="{{item.preview_image_url || item.preview_image_local_path || item.original_image_url || item.original_image_local_path}}" data-filename="{{item.preview_image_name || item.visualized_image_name || item.original_image_name}}">保存图片</button>
+          <button class="history-action-btn history-action-btn--danger" bindtap="deleteRecord" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="pagination-bar">
+      <button class="pagination-btn" disabled="{{!hasPreviousPage || loading}}" bindtap="previousPage">上一页</button>
+      <text class="pagination-info">第 {{page}} / {{totalPages}} 页</text>
+      <button class="pagination-btn" disabled="{{!hasNextPage || loading}}" bindtap="nextPage">下一页</button>
+    </view>
+  </view>
+
+  <view wx:else class="card empty-panel">
+    <view class="empty-state">
+      <view class="empty-state__icon">📋</view>
+      <view>暂无检测历史</view>
+      <view class="empty-state__tip">完成一次检测后，记录会出现在这里。</view>
+    </view>
+  </view>
+</view>

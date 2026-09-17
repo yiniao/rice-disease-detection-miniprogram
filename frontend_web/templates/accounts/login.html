@@ -1,0 +1,114 @@
+{% extends "web_portal/base.html" %}
+
+{% block title %}网页端登录{% endblock %}
+
+{% block content %}
+<style>
+    .auth-shell {
+        min-height: calc(100vh - 180px);
+        display: grid;
+        place-items: center;
+    }
+    .auth-card {
+        width: min(960px, 100%);
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+        gap: 0;
+        overflow: hidden;
+        border-radius: 32px;
+        background: rgba(255,255,255,0.96);
+        border: 1px solid #d5e4d0;
+        box-shadow: 0 24px 54px rgba(61, 104, 60, 0.1);
+    }
+    .auth-visual {
+        padding: 34px;
+        background:
+            linear-gradient(145deg, rgba(234,245,226,0.96), rgba(255,255,255,0.98)),
+            radial-gradient(circle at top right, rgba(214,173,87,0.18), transparent 40%);
+    }
+    .auth-pill {
+        display:inline-flex;
+        padding:8px 12px;
+        border-radius:999px;
+        background:#edf5e8;
+        color:#2d6a3d;
+        font-size:12px;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+    }
+    .auth-visual h1 {
+        margin:18px 0 10px;
+        font-size:42px;
+        line-height:1.08;
+    }
+    .auth-visual p {
+        margin:0;
+        color:#5a705f;
+        line-height:1.85;
+    }
+    .auth-points {
+        display:grid;
+        gap:12px;
+        margin-top:24px;
+    }
+    .auth-point {
+        padding:14px 16px;
+        border-radius:18px;
+        background: rgba(255,255,255,0.76);
+        border: 1px solid #dce7d7;
+        color:#355243;
+    }
+    .auth-form {
+        padding: 34px;
+    }
+    .auth-form h2 {
+        margin:0 0 8px;
+        font-size:30px;
+    }
+    .auth-actions {
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-top:20px;
+    }
+    @media (max-width: 900px) {
+        .auth-card {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-visual">
+            <div class="auth-pill">Unified Login</div>
+            <h1>进入你的病虫害检测工作台</h1>
+            <p>网页端与微信小程序共用同一套账号体系。登录后可以进入检测工作台、数据采集与个人统计页，所有记录会跨端同步。</p>
+            <div class="auth-points">
+                <div class="auth-point">同一账号可在网页端与小程序端共享历史记录与数据统计。</div>
+                <div class="auth-point">检测建议会明确区分 DeepSeek 回答与本地兜底文案。</div>
+                <div class="auth-point">管理员账号可额外查看全量统计并进行指定用户查询。</div>
+            </div>
+        </div>
+        <div class="auth-form">
+            <h2>网页端登录</h2>
+            <p class="muted" style="margin-top:0;">输入账号密码继续。</p>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                <div class="auth-actions">
+                    <button class="btn" type="submit">登录</button>
+                    <a class="btn btn-secondary" href="/accounts/register/">注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

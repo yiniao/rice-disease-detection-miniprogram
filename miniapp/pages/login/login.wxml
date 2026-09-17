@@ -1,0 +1,33 @@
+<view class="login-page">
+  <view class="login-card">
+    <view class="login-visual">
+      <view class="login-brand">
+        <view class="login-brand__icon">🌾</view>
+        <view class="login-brand__name">稻叶守护</view>
+      </view>
+      <view class="badge">统一登录</view>
+      <view class="login-title">进入你的水稻病虫害检测工作台</view>
+      <view class="login-copy">网页端与小程序端共用同一账号体系。登录后即可继续检测、回看历史、归档采集，并查看自己的统计分析结果。</view>
+      <view class="point-list">
+        <view class="point-item">同一账号跨端共享检测记录与采集数据。</view>
+        <view class="point-item">AI 建议会明确标记 DeepSeek 与本地兜底来源。</view>
+        <view class="point-item">管理员账号可额外查看全量统计与指定账户数据。</view>
+      </view>
+    </view>
+
+    <view class="login-form card">
+      <view class="mode-switch">
+        <view class="mode-pill {{mode === 'login' ? 'mode-pill--active' : ''}}" data-mode="login" bindtap="switchMode">登录</view>
+        <view class="mode-pill {{mode === 'register' ? 'mode-pill--active' : ''}}" data-mode="register" bindtap="switchMode">注册</view>
+      </view>
+      <view class="form-title">{{mode === 'register' ? '创建账号' : '账号登录'}}</view>
+      <view class="form-subtitle">{{mode === 'register' ? '注册后自动登录，并进入检测首页。' : '输入用户名和密码继续。'}}</view>
+      <input class="form-input" placeholder="用户名" value="{{username}}" bindinput="onUsernameInput" />
+      <input wx:if="{{mode === 'register'}}" class="form-input" placeholder="昵称（可选）" value="{{nickname}}" bindinput="onNicknameInput" />
+      <input class="form-input" placeholder="密码" password value="{{password}}" bindinput="onPasswordInput" />
+      <input wx:if="{{mode === 'register'}}" class="form-input" placeholder="确认密码" password value="{{confirmPassword}}" bindinput="onConfirmPasswordInput" />
+      <view wx:if="{{mode === 'register'}}" class="password-tip">密码至少 8 位，用户名不可重复。</view>
+      <button class="button-primary login-btn" bindtap="submitAuth" loading="{{loading}}">{{mode === 'register' ? '注册并进入' : '登录'}}</button>
+    </view>
+  </view>
+</view>

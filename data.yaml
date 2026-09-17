@@ -1,0 +1,15 @@
+# 数据集路径。这里原先是本机绝对路径，已改为相对占位路径，请按自己的数据存放位置修改。
+# 训练/验证/测试目录只需能被 YOLO 或你自己的训练脚本读到即可，本项目推理阶段只用 names。
+train: data/rice_leaf/images/train
+val: data/rice_leaf/images/valid
+test: data/rice_leaf/images/test  # 没有测试集可以注释此行
+nc: 8
+names:
+  0: healthy
+  1: brown_spot
+  2: leaf_scald
+  3: leaf_blast
+  4: bacterial_leaf_blight
+  5: leaf_smut
+  6: narrow_brown_spot
+  7: not_leaf

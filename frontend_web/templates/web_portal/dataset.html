@@ -1,0 +1,287 @@
+{% extends "web_portal/base.html" %}
+
+{% block title %}网页端数据采集{% endblock %}
+
+{% block content %}
+<style>
+    .dataset-stack { display:grid; gap:18px; }
+    .dataset-hero {
+        padding: 30px;
+        border-radius: 30px;
+        background:
+            linear-gradient(135deg, rgba(255,255,255,0.98), rgba(236,246,229,0.94)),
+            radial-gradient(circle at top right, rgba(124,166,109,0.18), transparent 36%);
+        border: 1px solid #d5e4d0;
+        box-shadow: 0 22px 50px rgba(61, 104, 60, 0.08);
+    }
+    .dataset-hero h1 { margin:0; font-size:40px; line-height:1.08; }
+    .dataset-hero p { margin:12px 0 0; color:#5a705f; line-height:1.8; max-width:760px; }
+    .hint-strip {
+        margin-top: 18px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+    .hint-pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.78);
+        border: 1px solid #dce7d7;
+        color:#355243;
+        font-size:13px;
+    }
+    .collect-grid,
+    .archive-grid {
+        display:grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap:14px;
+    }
+    .collect-card,
+    .archive-card {
+        position:relative;
+        overflow:hidden;
+    }
+    .collect-card::before,
+    .archive-card::before {
+        content:"";
+        position:absolute;
+        inset:0 auto auto 0;
+        width:100%;
+        height:4px;
+        background: linear-gradient(90deg, #2d6a3d, #d6ad57);
+    }
+    .collect-thumb {
+        width:100%;
+        height:190px;
+        object-fit:cover;
+        border-radius:18px;
+        background:#edf5e8;
+        margin-bottom:14px;
+    }
+    .path-text {
+        overflow-wrap:anywhere;
+        word-break:break-all;
+        line-height:1.6;
+    }
+    .collect-actions,
+    .archive-actions {
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-top:16px;
+    }
+    .btn-danger {
+        background:#b42318;
+        color:#fff;
+        box-shadow:none;
+    }
+    .btn-toggle-active {
+        background: linear-gradient(135deg, #b88422, #c89b35);
+        color:#fff;
+        box-shadow: 0 12px 24px rgba(184,132,34,0.18);
+    }
+    .archive-status {
+        display:inline-flex;
+        padding:6px 12px;
+        border-radius:999px;
+        background:#edf5e8;
+        color:#30583c;
+        font-size:12px;
+        font-weight:700;
+    }
+    .archive-status.active {
+        background:#f6ecd8;
+        color:#8d5a06;
+    }
+    .archive-entry {
+        display:grid;
+        grid-template-columns: 92px 1fr;
+        gap:14px;
+        align-items:start;
+    }
+    .archive-thumb {
+        width:92px;
+        height:92px;
+        border-radius:16px;
+        object-fit:cover;
+        background:#edf5e8;
+    }
+    .section-title { margin:0; font-size:24px; }
+    .section-subtitle { margin:6px 0 14px; color:#5a705f; line-height:1.7; }
+</style>
+
+<section class="dataset-stack">
+    <div class="dataset-hero">
+        <h1>检测图片归档采集中心</h1>
+        <p>从你自己的检测历史中直接挑选原始图片进行归档。页面强调“快速筛图、快速归档、快速删除”的工作流，不再需要二次跳转或额外表单确认。</p>
+        <div class="hint-strip">
+            <span class="hint-pill">保存的是原图</span>
+            <span class="hint-pill">点击即归档/取消归档</span>
+            <span class="hint-pill">已归档列表支持删除</span>
+            <span class="hint-pill">适合训练集预选</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">我的检测历史</h2>
+        <div class="section-subtitle">选择想要收集的检测图。已归档时按钮会变色，再点击一次即可取消归档。</div>
+        <div class="collect-grid">
+            {% for detection in detections %}
+                <div class="card collect-card">
+                    <img class="collect-thumb" src="{{ detection.original_image.url }}" alt="检测原图">
+                    <strong>#{{ detection.id }} · {{ detection.get_status_display }}</strong>
+                    <div class="muted path-text" style="margin-top:8px;" title="{{ detection.original_image.name }}">原图：{{ detection.original_image.name }}</div>
+                    <div class="muted" style="margin-top:8px;">分辨率：{{ detection.image_width }} × {{ detection.image_height }}</div>
+                    <div class="muted" style="margin-top:8px;">时间：{{ detection.created_at|date:"Y-m-d H:i" }}</div>
+                    {% if detection.advice %}
+                        <div class="muted" style="margin-top:8px;">建议来源：{{ detection.advice.get_source_display }}</div>
+                    {% endif %}
+                    <div class="collect-actions">
+                        <button
+                            class="btn {% if detection.is_collected %}btn-toggle-active{% endif %}"
+                            type="button"
+                            data-toggle-archive
+                            data-detection-id="{{ detection.id }}"
+                            data-collected="{% if detection.is_collected %}true{% else %}false{% endif %}"
+                        >{% if detection.is_collected %}取消归档{% else %}收集此图{% endif %}</button>
+                        <span class="archive-status {% if detection.is_collected %}active{% endif %}" data-status-label>{% if detection.is_collected %}已归档{% else %}未归档{% endif %}</span>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="muted">还没有检测记录，先去上传检测图片。</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">已收集数据</h2>
+        <div class="section-subtitle">这里展示已经归档到数据集的图片，支持直接删除。</div>
+        <div class="archive-grid" id="archive-grid">
+            {% for item in items %}
+                <div class="card archive-card" data-archive-item data-item-id="{{ item.id }}" data-source-detection-id="{{ item.source_detection_id }}">
+                    <div class="archive-entry">
+                        {% if item.image %}
+                            <img class="archive-thumb" src="{{ item.image.url }}" alt="采集图片">
+                        {% endif %}
+                        <div>
+                            <strong>#{{ item.id }} · {{ item.get_status_display }}</strong>
+                            <div class="muted" style="margin-top:6px;">来源检测：{% if item.source_detection %}#{{ item.source_detection.id }}{% endif %}</div>
+                            <div class="muted path-text" style="margin-top:6px;" title="{{ item.image.name }}">图片路径：{{ item.image.name }}</div>
+                            <div class="archive-actions">
+                                <form method="post" action="/web/dataset/{{ item.id }}/delete/" onsubmit="return window.confirm('确定删除这条已归档图片吗？');">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger" type="submit">删除归档图片</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="muted" id="archive-empty">还没有采集记录。</p>
+            {% endfor %}
+        </div>
+        {% if items %}
+            <p class="muted" id="archive-empty" style="display:none;">还没有采集记录。</p>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    (function () {
+        const archiveGrid = document.getElementById('archive-grid');
+        const archiveEmpty = document.getElementById('archive-empty');
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return '';
+        }
+
+        const csrfToken = getCookie('csrftoken');
+
+        function ensureEmptyState() {
+            const hasItems = !!archiveGrid.querySelector('[data-archive-item]');
+            if (archiveEmpty) {
+                archiveEmpty.style.display = hasItems ? 'none' : 'block';
+            }
+        }
+
+        function buildArchiveCard(item) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card archive-card';
+            wrapper.setAttribute('data-archive-item', '');
+            wrapper.dataset.itemId = item.id;
+            wrapper.dataset.sourceDetectionId = item.source_detection_id || '';
+            wrapper.innerHTML = `
+                <div class="archive-entry">
+                    <img class="archive-thumb" src="${item.image_url}" alt="采集图片">
+                    <div>
+                        <strong>#${item.id} · ${item.status_display}</strong>
+                        <div class="muted" style="margin-top:6px;">来源检测：${item.source_detection_id ? `#${item.source_detection_id}` : '-'}</div>
+                        <div class="muted path-text" style="margin-top:6px;" title="${item.image_path}">图片路径：${item.image_path}</div>
+                        <div class="archive-actions">
+                            <form method="post" action="/web/dataset/${item.id}/delete/" onsubmit="return window.confirm('确定删除这条已归档图片吗？');">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <button class="btn btn-danger" type="submit">删除归档图片</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return wrapper;
+        }
+
+        async function toggleArchive(button) {
+            const detectionId = button.dataset.detectionId;
+            const statusLabel = button.parentElement.querySelector('[data-status-label]');
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.textContent = '处理中...';
+            try {
+                const response = await fetch(`/api/dataset-toggle/${detectionId}/`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'X-CSRFToken': csrfToken },
+                });
+                const payload = await response.json();
+                if (!response.ok) {
+                    throw new Error(payload.detail || `HTTP ${response.status}`);
+                }
+                if (payload.collected) {
+                    button.textContent = '取消归档';
+                    button.classList.add('btn-toggle-active');
+                    statusLabel.textContent = '已归档';
+                    statusLabel.classList.add('active');
+                    const existing = archiveGrid.querySelector(`[data-source-detection-id="${detectionId}"]`);
+                    if (!existing && payload.dataset_image) {
+                        archiveGrid.prepend(buildArchiveCard(payload.dataset_image));
+                    }
+                } else {
+                    button.textContent = '收集此图';
+                    button.classList.remove('btn-toggle-active');
+                    statusLabel.textContent = '未归档';
+                    statusLabel.classList.remove('active');
+                    payload.removed_ids.forEach((id) => {
+                        archiveGrid.querySelector(`[data-item-id="${id}"]`)?.remove();
+                    });
+                }
+                ensureEmptyState();
+            } catch (error) {
+                window.alert(error.message || '操作失败');
+                button.textContent = originalText;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        document.querySelectorAll('[data-toggle-archive]').forEach((button) => {
+            button.addEventListener('click', () => toggleArchive(button));
+        });
+        ensureEmptyState();
+    })();
+</script>
+{% endblock %}

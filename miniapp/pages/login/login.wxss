@@ -1,0 +1,147 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.login-card {
+  width: 100%;
+  display: grid;
+  gap: 20rpx;
+}
+
+.login-visual,
+.login-form {
+  background: #ffffff;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(17, 24, 39, 0.06);
+}
+
+.login-visual {
+  padding: 28rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.login-brand__icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+  font-size: 48rpx;
+  line-height: 88rpx;
+  text-align: center;
+  box-shadow: 0 10rpx 24rpx rgba(46, 125, 50, 0.12);
+}
+
+.login-brand__name {
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #2e7d32;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+}
+
+.login-title {
+  margin-top: 16rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.12;
+}
+
+.login-copy {
+  margin-top: 12rpx;
+  color: #6b7280;
+  line-height: 1.8;
+  font-size: 26rpx;
+}
+
+.point-list {
+  display: grid;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.point-item {
+  padding: 16rpx;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e5e7eb;
+  color: #374151;
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.login-form {
+  padding: 28rpx;
+}
+
+.mode-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 8rpx;
+  border-radius: 999rpx;
+  background: #f3f6fb;
+  gap: 8rpx;
+}
+
+.mode-pill {
+  min-width: 144rpx;
+  padding: 14rpx 24rpx;
+  border-radius: 999rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.mode-pill--active {
+  background: #2e7d32;
+  color: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(22, 119, 255, 0.18);
+}
+
+.form-title {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 20rpx;
+}
+
+.form-subtitle {
+  margin-top: 8rpx;
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.password-tip {
+  margin-top: 14rpx;
+  color: #6b7280;
+  font-size: 22rpx;
+  line-height: 1.7;
+}
+
+.login-btn {
+  margin-top: 18rpx;
+}
+
+@media screen and (min-width: 900px) {
+  .login-card {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
+}

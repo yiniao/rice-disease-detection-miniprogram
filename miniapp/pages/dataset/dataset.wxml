@@ -1,0 +1,84 @@
+<view class="dataset-page page-shell">
+  <view class="dataset-hero card glass">
+    <view class="hero-badge">数据集采集中心</view>
+    <view class="hero-title">归档前先确认类别，数据集才有实际价值</view>
+    <view class="hero-copy">
+      每次归档都会记录所属病虫害类别。上方支持直接筛选类别和归档状态，方便快速检查当前采集质量。
+    </view>
+    <view class="hero-stats">
+      <view class="hero-stat">
+        <text class="hero-stat-value">{{detectionCount}}</text>
+        <text class="hero-stat-label">当前检测记录</text>
+      </view>
+      <view class="hero-stat">
+        <text class="hero-stat-value">{{itemCount}}</text>
+        <text class="hero-stat-label">当前归档数据</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">筛选栏</view>
+        <view class="section-subtitle">按归档状态和病虫害类别快速过滤采集列表。</view>
+      </view>
+    </view>
+    <view class="filter-grid">
+      <picker range="{{statusOptions}}" range-key="label" value="{{selectedStatusIndex}}" bindchange="onStatusChange">
+        <view class="filter-item">
+          <text class="filter-label">归档状态</text>
+          <text class="filter-value">{{selectedStatusLabel}}</text>
+        </view>
+      </picker>
+      <picker range="{{categoryOptions}}" range-key="label" value="{{selectedCategoryIndex}}" bindchange="onCategoryChange">
+        <view class="filter-item">
+          <text class="filter-label">病虫害类别</text>
+          <text class="filter-value">{{selectedCategoryLabel}}</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="section-card card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">采集记录列表</view>
+        <view class="section-subtitle">通过顶部筛选查看待归档或已归档记录，并直接完成归档、取消归档和详情查看。</view>
+      </view>
+    </view>
+
+    <view wx:if="{{detections.length}}" class="history-grid">
+      <view wx:for="{{detections}}" wx:key="id" class="history-card">
+        <image wx:if="{{item.original_image_local_path || item.original_image_url}}" class="history-thumb" src="{{item.original_image_local_path || item.original_image_url}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.original_image_local_path || item.original_image_url}}" data-filename="{{item.original_image_name}}"></image>
+        <view class="history-body">
+          <view class="history-title">{{item.record_code}}</view>
+          <view class="meta-chip-row">
+            <view class="meta-chip">{{item.archived_category_label || item.primary_category}}</view>
+            <view wx:if="{{item.status_text}}" class="status-chip {{item.status_class}}">{{item.status_text}}</view>
+          </view>
+          <view class="history-meta">分辨率：{{item.image_width}} × {{item.image_height}}</view>
+          <view class="history-meta">时间：{{item.display_created_at}}</view>
+          <view wx:if="{{item.is_collected}}" class="history-meta">归档记录：{{item.dataset_record_code}} · 类别 {{item.archived_category_label}}</view>
+          <view class="record-action-grid">
+            <button class="record-action-btn record-action-btn--secondary" bindtap="openDetectionDetail" data-id="{{item.id}}">查看详情</button>
+            <button class="record-action-btn record-action-btn--primary" bindtap="saveImage" data-url="{{item.original_image_url || item.original_image_local_path}}" data-filename="{{item.original_image_name}}">保存图片</button>
+            <button
+              class="record-action-btn {{item.collect_button_class || (item.is_collected ? 'record-action-btn--warning' : 'record-action-btn--primary')}}"
+              bindtap="toggleDetectionCollection"
+              data-id="{{item.id}}"
+            ><text class="record-action-btn__text">{{item.collect_button_text}}</text></button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{detections.length}}" class="pagination-bar">
+      <button class="pagination-btn" disabled="{{!hasPreviousPage || loading}}" bindtap="previousPage">上一页</button>
+      <text class="pagination-info">第 {{page}} / {{totalPages}} 页</text>
+      <button class="pagination-btn" disabled="{{!hasNextPage || loading}}" bindtap="nextPage">下一页</button>
+    </view>
+
+    <view wx:else class="empty-state">当前筛选条件下没有可展示的采集记录。</view>
+  </view>
+</view>

@@ -1,0 +1,45 @@
+<view class="profile-page page-shell">
+  <view class="card profile-hero">
+    <view class="profile-top">
+      <view class="avatar">{{avatarText}}</view>
+      <view class="profile-meta">
+        <view class="profile-name">{{user.nickname || user.username || '未登录用户'}}</view>
+        <view class="profile-subtitle">{{user.role || 'user'}} · 统一账号中心</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card profile-panel">
+    <view class="profile-title">账户信息</view>
+    <view class="info-grid">
+      <view class="form-field">
+        <view class="info-label">用户名</view>
+        <input class="form-input" value="{{username}}" bindinput="onUsernameInput" />
+      </view>
+      <view class="form-field">
+        <view class="info-label">昵称</view>
+        <input class="form-input" value="{{nickname}}" bindinput="onNicknameInput" />
+      </view>
+      <view class="info-field">
+        <view class="info-label">角色</view>
+        <view class="info-value">{{user.role || '-'}}</view>
+      </view>
+      <view class="form-field">
+        <view class="info-label">当前密码</view>
+        <input class="form-input" password placeholder="修改密码时填写" value="{{oldPassword}}" bindinput="onOldPasswordInput" />
+      </view>
+      <view class="form-field">
+        <view class="info-label">新密码</view>
+        <input class="form-input" password placeholder="至少 8 位" value="{{newPassword}}" bindinput="onNewPasswordInput" />
+      </view>
+      <view class="form-field">
+        <view class="info-label">确认新密码</view>
+        <input class="form-input" password placeholder="再次输入新密码" value="{{confirmPassword}}" bindinput="onConfirmPasswordInput" />
+      </view>
+    </view>
+    <view class="profile-actions">
+      <button class="button-primary save-btn" bindtap="saveProfile" loading="{{saving}}">保存修改</button>
+      <button class="button-secondary logout-btn" bindtap="doLogout">退出登录</button>
+    </view>
+  </view>
+</view>
