@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 # rice-disease-detection-miniprogram
-=======
+
 # 水稻病虫害检测系统
 
 基于 Django REST Framework + 微信小程序示例前端的水稻病虫害检测 MVP，包含：
@@ -28,24 +27,27 @@
 
 小程序底部共 5 个标签页：**检测 / 历史 / 采集 / 统计 / 我的**。
 
+> 截图统一以 `width="280"` 渲染。用 Markdown 表格并排时列宽由单元格最长内容决定，
+> 不锁定宽度会导致同一行两张图一大一小。
+
 | 上传检测 | AI 防治建议 |
 | --- | --- |
-| ![上传检测页](docs/images/ui-detect.png) | ![AI 防治建议](docs/images/ui-ai-advice.png) |
-| 上传叶片照片，识别病虫害并给出防治建议 | 识别到叶黑粉病 68.5%，DeepSeek 生成分节建议 |
+| <img src="docs/images/ui-detect.png" width="280" alt="上传检测页" /> | <img src="docs/images/ui-ai-advice.png" width="280" alt="AI 防治建议" /> |
+| 上传叶片照片，识别病虫害 | DeepSeek 生成防治建议 |
 
 | 检测结果详情 | 检测历史 |
 | --- | --- |
-| ![检测结果详情页](docs/images/ui-result.png) | ![检测历史页](docs/images/ui-history.png) |
-| 可视化标注框、模型版本、分辨率、建议来源 | 历史归档，支持查看详情 / 保存图片 / 删除 |
+| <img src="docs/images/ui-result.png" width="280" alt="检测结果详情页" /> | <img src="docs/images/ui-history.png" width="280" alt="检测历史页" /> |
+| 可视化标注与模型信息 | 历史归档，结果回溯 |
 
 | 数据采集 | 数据统计 |
 | --- | --- |
-| ![数据采集页](docs/images/ui-dataset.png) | ![数据统计页](docs/images/ui-statistics-2.png) |
-| 采集并归档数据集图片，用于后续训练 | 检测趋势与病虫害类别分布 |
+| <img src="docs/images/ui-dataset.png" width="280" alt="数据采集页" /> | <img src="docs/images/ui-statistics-2.png" width="280" alt="数据统计页" /> |
+| 采集归档数据集图片 | 检测趋势与类别分布 |
 
 | 我的 |
 | --- |
-| ![我的页](docs/images/ui-profile.png) |
+| <img src="docs/images/ui-profile.png" width="280" alt="我的页" /> |
 | 账户信息与修改密码 |
 
 <details>
@@ -53,8 +55,8 @@
 
 | | |
 | --- | --- |
-| ![采集界面（二）](docs/images/ui-dataset-2.png) | ![历史界面（二）](docs/images/ui-history-2.png) |
-| ![统计界面（一）](docs/images/ui-statistics-1.png) | ![统计界面（三）](docs/images/ui-statistics-3.png) |
+| <img src="docs/images/ui-dataset-2.png" width="280" alt="采集界面（二）" /> | <img src="docs/images/ui-history-2.png" width="280" alt="历史界面（二）" /> |
+| <img src="docs/images/ui-statistics-1.png" width="280" alt="统计界面（一）" /> | <img src="docs/images/ui-statistics-3.png" width="280" alt="统计界面（三）" /> |
 
 </details>
 
@@ -233,7 +235,11 @@ DEEPSEEK_MODEL=deepseek-chat
 - **Docker 镜像不含 `.env`**：凭据由云托管环境变量注入，避免随镜像分发。
 - **初始管理员**：密码来自 `DJANGO_ADMIN_PASSWORD`，代码中不存在默认口令。
 - 运行期产物（`db.sqlite3`、`media/`、`test_media/`、`staticfiles/`、日志）均已在 `.gitignore` 中排除。
+---
+## 免责声明
 
-> ⚠️ 用 GitHub 网页版「拖拽上传 / Add file」不会读取 `.gitignore`，可能把本地 `.env` 一起传上去。
-> 请用 `git add` + `git push` 提交，push 前用 `git status` 确认 `.env`、`config.local.js` 不在待提交列表里。
->>>>>>> d51a225 (Initial commit: Rice Disease Detection WeChat MiniProgram 水稻病害检测微信小程序)
+本项目仅供学习与交流使用。
+
+---
+
+**联系邮箱**:[3282691847@qq.com](mailto:3282691847@qq.com)
